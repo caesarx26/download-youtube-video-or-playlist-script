@@ -3,10 +3,6 @@ from pytube import Playlist
 import os
 import moviepy.editor as mp
 
-# path for windows download folder
-DOWNLOADS_PATH = fr"{os.environ['UserProfile']}\Downloads"
-
-
 # function to download YouTube video and convert to audio if desired
 # by default will download in current directory and not convert to audio
 def download_youtube_video(url: str, video_output_path: str = "", convert_to_audio: bool = False):
