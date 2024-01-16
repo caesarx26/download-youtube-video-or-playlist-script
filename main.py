@@ -38,13 +38,13 @@ def download_youtube_video(url: str, video_output_path: str = "", convert_to_aud
         # converting the video file to an audio file
         print("Converting video to audio ...")
         convert_video_to_audio(path_of_video_clip, output_path=video_output_path, video_title=stream.title)
-        print('Done converting video to mp3!')
+        print("Done converting video to mp3!")
 
         # try to delete video file after converting to audio file
         try:
             os.remove(path_of_video_clip)
-        except:
-            raise Exception("Error occurred while deleting video file!")
+        except OSError as error:
+            raise Exception(error)
 
 
 # function to download YouTube playlist and convert each video to an audio file is so desired
@@ -68,14 +68,21 @@ def download_youtube_playlist(url: str, video_output_path: str = "", convert_to_
         streams = None
         try:
             youtube_video = YouTube(youtube_url)
+
         except VideoUnavailable:
             print(f'Video {youtube_url} is unavailable, skipping.')
+
         else:
-            print("Downloading: " + str(youtube_video.title) + "\n")
-            print('Downloading video ...\n')
-            streams = youtube_video.streams.first()
-            streams.download(output_path=video_output_path)
-            print('Done downloading video!\n')
+            # now to try actually downloading the video
+            try:
+                print("Downloading: " + str(youtube_video.title) + "\n")
+                print("Downloading video ...\n")
+                streams = youtube_video.streams.first()
+                streams.download(output_path=video_output_path)
+                print("Done downloading video!\n")
+
+            except:
+                raise Exception("Error occurred while downloading video!")
 
         # check if we need to convert the video file to an audio file
         if convert_to_audio:
@@ -88,13 +95,13 @@ def download_youtube_playlist(url: str, video_output_path: str = "", convert_to_
             print("Converting video to audio ...")
             convert_video_to_audio(path_of_video_clip, output_path=video_output_path,
                                    video_title=streams.title)
-            print('Done converting video to mp3!')
+            print("Done converting video to mp3!")
 
             # try to delete video file after converting to audio file
             try:
                 os.remove(path_of_video_clip)
-            except:
-                raise Exception("Error occurred while deleting video file!")
+            except OSError as error:
+                raise Exception(error)
 
 
 # function to convert a video file to an audio file mp3
@@ -186,11 +193,11 @@ if __name__ == '__main__':
             print("\n")
 
         else:
-            print("Please select a valid option!\n\n")
+            print("Please select a valid option!\n")
             continue
 
         # asking if user wants to end script or convert another video or playlist
-        print("Enter 'y': to download another YouTube video or playlist ")
+        print("Enter 'y' to download another YouTube video or playlist: ")
         print("Enter anything else to exit the script: ")
         print(">: ")
         exit_input = str(input())
