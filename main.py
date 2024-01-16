@@ -1,7 +1,8 @@
-from pytube import YouTube
-from pytube import Playlist
+from pytube import YouTube, Playlist
+from pytube.exceptions import VideoUnavailable
 import os
 import moviepy.editor as mp
+
 
 # function to download YouTube video and convert to audio if desired
 # by default will download in current directory and not convert to audio
@@ -15,8 +16,8 @@ def download_youtube_video(url: str, video_output_path: str = "", convert_to_aud
         # creating YouTube video object
         youtube_video = YouTube(url)
         print("Downloading: " + str(youtube_video.title) + "\n")
-    except:
-        raise Exception("Invalid video url!")
+    except VideoUnavailable:
+        raise Exception(f'Invalid video url: {url}')
 
     # video url was valid need to try to download stream of the video
     try:
@@ -62,30 +63,31 @@ def download_youtube_playlist(url: str, video_output_path: str = "", convert_to_
         raise Exception("Invalid playlist url!")
 
     # downloading all the videos in the playlist
-    for youtube_video in youtube_playlist.videos:
-
-        print("Downloading: " + str(youtube_video.title) + "\n")
-
-        # playlist url was valid need to try to download streams of the videos
+    for youtube_url in youtube_playlist.video_urls:
+        # playlist url was valid need to try to download a stream of each of the videos
+        streams = None
         try:
+            youtube_video = YouTube(youtube_url)
+        except VideoUnavailable:
+            print(f'Video {youtube_url} is unavailable, skipping.')
+        else:
+            print("Downloading: " + str(youtube_video.title) + "\n")
             print('Downloading video ...\n')
-            stream = youtube_video.streams.first()
-            stream.download(output_path=video_output_path)
+            streams = youtube_video.streams.first()
+            streams.download(output_path=video_output_path)
             print('Done downloading video!\n')
-        except:
-            raise Exception("Error occurred while downloading video!")
 
         # check if we need to convert the video file to an audio file
         if convert_to_audio:
             # setting path of the video clip
-            path_of_video_clip = fr"{video_output_path}\{stream.default_filename}"
+            path_of_video_clip = fr"{video_output_path}\{streams.default_filename}"
             if video_output_path == '':
-                path_of_video_clip = stream.default_filename
+                path_of_video_clip = streams.default_filename
 
             # converting the video file to an audio file
             print("Converting video to audio ...")
             convert_video_to_audio(path_of_video_clip, output_path=video_output_path,
-                                   video_title=stream.title)
+                                   video_title=streams.title)
             print('Done converting video to mp3!')
 
             # try to delete video file after converting to audio file
@@ -96,7 +98,6 @@ def download_youtube_playlist(url: str, video_output_path: str = "", convert_to_
 
 
 # function to convert a video file to an audio file mp3
-# will return true if successful otherwise false
 def convert_video_to_audio(video_file_path: str, output_path="", video_title='temp'):
     try:
         clip = mp.VideoFileClip(video_file_path)
