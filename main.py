@@ -150,7 +150,7 @@ if __name__ == '__main__':
 
             # asking user if they want the videos converted as mp3 files
             print("Enter 'y': to convert YouTube video to an audio file (.mp3)")
-            print("Enter anything else to leave the youtube video as a video file ")
+            print("Enter anything else to leave the youtube video as a video file: ")
             print(">: ")
             audio_input = str(input())
             print("\n")
@@ -178,8 +178,8 @@ if __name__ == '__main__':
             print("\n")
 
             # asking user if they want the videos converted as mp3 files
-            print("Enter 'y': to convert YouTube videos to audio files (.mp3)")
-            print("Enter anything else to leave the youtube videos as video files ")
+            print("Enter 'y': to convert YouTube videos to audio files (.mp3) ")
+            print("Enter anything else to leave the youtube videos as video files: ")
             print(">: ")
             audio_input = str(input())
             print("\n")
@@ -197,7 +197,7 @@ if __name__ == '__main__':
             continue
 
         # asking if user wants to end script or convert another video or playlist
-        print("Enter 'y' to download another YouTube video or playlist: ")
+        print("Enter 'y': to download another YouTube video or playlist ")
         print("Enter anything else to exit the script: ")
         print(">: ")
         exit_input = str(input())
